@@ -37,13 +37,17 @@ public class Main {
                     System.out.println(Arrays.toString(row));
                 }
 
-                // Determine and display entry and exit points 
+                // Determine and display entry and exit points
                 int[] entryPoint = findEntryPoint(maze);
                 int[] exitPoint = findExitPoint(maze);
 
-                // Add 1 to each point to account for Java indexing that may confuse user
-                logger.info("Entry Point: " + Arrays.toString(new int[] {++entryPoint[0],++entryPoint[1]}));
-                logger.info("Exit Point: " + Arrays.toString(new int[] {++exitPoint[0], ++exitPoint[1]}));
+                // Adjusting for 1-based indexing for user display
+                logger.info("Entry Point: " + Arrays.toString(new int[]{entryPoint[0] + 1, entryPoint[1] + 1}));
+                logger.info("Exit Point: " + Arrays.toString(new int[]{exitPoint[0] + 1, exitPoint[1] + 1}));
+
+                // Compute and display the canonical path
+                String canonicalPath = findCanonicalPath(maze, entryPoint, exitPoint);
+                logger.info("Canonical Path: " + canonicalPath);
             } else {
                 logger.error("No input file provided. Use -i to specify the maze file.");
             }
@@ -105,7 +109,7 @@ public class Main {
      * Finds the entry point of the maze on the leftmost column.
      *
      * @param maze 2D character array representing the maze.
-     * @return Array [row, column] of the entry point, or [-1, -1] if not found.
+     * @return Array [row, column] of the entry point.
      */
     private static int[] findEntryPoint(char[][] maze) {
         for (int row = 0; row < maze.length; row++) {
@@ -113,14 +117,14 @@ public class Main {
                 return new int[]{row, 0};
             }
         }
-        return new int[]{-1, -1}; // Entry not found
+        throw new IllegalStateException("Maze must have a valid entry point.");
     }
 
     /**
      * Finds the exit point of the maze on the rightmost column.
      *
      * @param maze 2D character array representing the maze.
-     * @return Array [row, column] of the exit point, or [-1, -1] if not found.
+     * @return Array [row, column] of the exit point.
      */
     private static int[] findExitPoint(char[][] maze) {
         int lastColumn = maze[0].length - 1; // Rightmost column
@@ -129,6 +133,36 @@ public class Main {
                 return new int[]{row, lastColumn};
             }
         }
-        return new int[]{-1, -1}; // Exit not found
+        throw new IllegalStateException("Maze must have a valid exit point.");
+    }
+
+    /**
+     * Finds the canonical path from the entry point to the exit point in a straight maze.
+     *
+     * @param maze       2D character array representing the maze.
+     * @param entryPoint Array [row, column] of the entry point.
+     * @param exitPoint  Array [row, column] of the exit point.
+     * @return The canonical path as a string (e.g., "FFFF").
+     */
+    private static String findCanonicalPath(char[][] maze, int[] entryPoint, int[] exitPoint) {
+        StringBuilder path = new StringBuilder();
+
+        int currentRow = entryPoint[0];
+        int currentCol = entryPoint[1];
+
+        while (currentRow != exitPoint[0] || currentCol != exitPoint[1]) {
+            if (currentCol < exitPoint[1]) {
+                currentCol++; // Move right
+                path.append("F");
+            } else if (currentRow < exitPoint[0]) {
+                currentRow++; // Move down
+                path.append("F");
+            } else if (currentRow > exitPoint[0]) {
+                currentRow--; // Move up
+                path.append("F");
+            }
+        }
+
+        return path.toString();
     }
 }
