@@ -45,9 +45,13 @@ public class Main {
                 logger.info("Entry Point: " + Arrays.toString(new int[]{entryPoint[0] + 1, entryPoint[1] + 1}));
                 logger.info("Exit Point: " + Arrays.toString(new int[]{exitPoint[0] + 1, exitPoint[1] + 1}));
 
-                // Compute and display the canonical path
+                // Compute the canonical path
                 String canonicalPath = findCanonicalPath(maze, entryPoint, exitPoint);
                 logger.info("Canonical Path: " + canonicalPath);
+
+                // Compute the factorized path
+                String factorizedPath = factorizePath(canonicalPath);
+                logger.info("Factorized Path: " + factorizedPath);
             } else {
                 logger.error("No input file provided. Use -i to specify the maze file.");
             }
@@ -164,5 +168,37 @@ public class Main {
         }
 
         return path.toString();
+    }
+
+    /**
+     * Converts a canonical path into its factorized form.
+     *
+     * @param canonicalPath The canonical path as a string (e.g., "FFFFFF").
+     * @return The factorized form as a string (e.g., "6F").
+     */
+    private static String factorizePath(String canonicalPath) {
+        if (canonicalPath.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder factorizedPath = new StringBuilder();
+        char currentChar = canonicalPath.charAt(0);
+        int count = 0;
+
+        for (char c : canonicalPath.toCharArray()) {
+            if (c == currentChar) {
+                count++;
+            } else {
+                // Append the count and the current character
+                factorizedPath.append(count).append(currentChar).append(" ");
+                currentChar = c;
+                count = 1;
+            }
+        }
+
+        // Append the last group
+        factorizedPath.append(count).append(currentChar);
+
+        return factorizedPath.toString().trim();
     }
 }
