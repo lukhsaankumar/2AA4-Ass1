@@ -1,9 +1,7 @@
 package ca.mcmaster.se2aa4.mazerunner;
-
 import org.apache.commons.cli.*;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -12,31 +10,24 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Main {
-
     private static final Logger logger = LogManager.getLogger();
-
     public static void main(String[] args) {
-        logger.info("** Starting Maze Runner");
-
-        // Define command-line options
+        logger.info("** Starting Maze Runner"); // Define command-line options
         Options options = new Options();
         options.addOption("i", "input", true, "Path to the input maze file");
-
+        options.addOption("p", "path", true, "Path to validate against the maze");
         CommandLineParser parser = new DefaultParser();
-
         try {
             CommandLine cmd = parser.parse(options, args);
             if (cmd.hasOption("i")) {
                 String inputFile = cmd.getOptionValue("i");
                 logger.info("Reading the maze from file: " + inputFile);
                 char[][] maze = readMaze(inputFile);
-
+                logger.info("Parsed Maze as 2D Array:"); 
+                
                 // Print the parsed 2D array representation of the maze
-                logger.info("Parsed Maze as 2D Array:");
-                for (char[] row : maze) {
-                    System.out.println(Arrays.toString(row));
-                }
-
+                for (char[] row : maze) { System.out.println(Arrays.toString(row)); }
+                
                 // Determine and display entry and exit points
                 int[] entryPoint = findEntryPoint(maze);
                 int[] exitPoint = findExitPoint(maze);
@@ -52,6 +43,19 @@ public class Main {
                 // Compute the factorized path
                 String factorizedPath = factorizePath(canonicalPath);
                 logger.info("Factorized Path: " + factorizedPath);
+
+                // Validate the provided path if the -p flag is used
+                if (cmd.hasOption("p")) {
+                    String inputPath = cmd.getOptionValue("p");
+                    logger.info("Validating path: " + inputPath);
+                    boolean isValid = validatePath(maze, entryPoint, inputPath);
+
+                    if (isValid) {
+                        logger.info("The path is VALID.");
+                    } else {
+                        logger.error("The path is INVALID.");
+                    }
+                }
             } else {
                 logger.error("No input file provided. Use -i to specify the maze file.");
             }
@@ -64,9 +68,6 @@ public class Main {
 
     /**
      * Reads a maze from a file and parses it into a 2D character array.
-     *
-     * @param filePath Path to the maze file.
-     * @return 2D character array representing the maze.
      */
     private static char[][] readMaze(String filePath) {
         List<char[]> mazeRows = new ArrayList<>();
@@ -75,26 +76,20 @@ public class Main {
         try (BufferedReader reader = new BufferedReader(new FileReader(filePath))) {
             String line;
 
-            // First pass: Determine the maximum row length
             while ((line = reader.readLine()) != null) {
                 maxRowLength = Math.max(maxRowLength, line.length());
             }
 
-            // Reset the reader to process the file again
             reader.close();
             BufferedReader secondReader = new BufferedReader(new FileReader(filePath));
 
-            // Second pass: Read each line and preserve empty lines
             while ((line = secondReader.readLine()) != null) {
                 if (line.isEmpty()) {
-                    // Preserve empty rows as spaces
                     char[] emptyRow = new char[maxRowLength];
-                    Arrays.fill(emptyRow, ' '); // Fill the row entirely with spaces
+                    Arrays.fill(emptyRow, ' ');
                     mazeRows.add(emptyRow);
                 } else {
-                    // Add the line as a character array
                     char[] row = line.toCharArray();
-                    // If row is shorter than maxRowLength, pad it with spaces
                     if (row.length < maxRowLength) {
                         row = Arrays.copyOf(row, maxRowLength);
                     }
@@ -105,19 +100,15 @@ public class Main {
             logger.error("Error reading maze file", e);
         }
 
-        // Convert the list of rows to a 2D character array
         return mazeRows.toArray(new char[0][]);
     }
 
     /**
      * Finds the entry point of the maze on the leftmost column.
-     *
-     * @param maze 2D character array representing the maze.
-     * @return Array [row, column] of the entry point.
      */
     private static int[] findEntryPoint(char[][] maze) {
         for (int row = 0; row < maze.length; row++) {
-            if (maze[row][0] == ' ') { // Check leftmost column
+            if (maze[row][0] == ' ') {
                 return new int[]{row, 0};
             }
         }
@@ -126,14 +117,11 @@ public class Main {
 
     /**
      * Finds the exit point of the maze on the rightmost column.
-     *
-     * @param maze 2D character array representing the maze.
-     * @return Array [row, column] of the exit point.
      */
     private static int[] findExitPoint(char[][] maze) {
-        int lastColumn = maze[0].length - 1; // Rightmost column
+        int lastColumn = maze[0].length - 1;
         for (int row = 0; row < maze.length; row++) {
-            if (maze[row][lastColumn] == ' ') { // Check rightmost column
+            if (maze[row][lastColumn] == ' ') {
                 return new int[]{row, lastColumn};
             }
         }
@@ -142,11 +130,6 @@ public class Main {
 
     /**
      * Finds the canonical path from the entry point to the exit point in a straight maze.
-     *
-     * @param maze       2D character array representing the maze.
-     * @param entryPoint Array [row, column] of the entry point.
-     * @param exitPoint  Array [row, column] of the exit point.
-     * @return The canonical path as a string (e.g., "FFFF").
      */
     private static String findCanonicalPath(char[][] maze, int[] entryPoint, int[] exitPoint) {
         StringBuilder path = new StringBuilder();
@@ -156,13 +139,13 @@ public class Main {
 
         while (currentRow != exitPoint[0] || currentCol != exitPoint[1]) {
             if (currentCol < exitPoint[1]) {
-                currentCol++; // Move right
+                currentCol++;
                 path.append("F");
             } else if (currentRow < exitPoint[0]) {
-                currentRow++; // Move down
+                currentRow++;
                 path.append("F");
             } else if (currentRow > exitPoint[0]) {
-                currentRow--; // Move up
+                currentRow--;
                 path.append("F");
             }
         }
@@ -172,9 +155,6 @@ public class Main {
 
     /**
      * Converts a canonical path into its factorized form.
-     *
-     * @param canonicalPath The canonical path as a string (e.g., "FFFFFF").
-     * @return The factorized form as a string (e.g., "6F").
      */
     private static String factorizePath(String canonicalPath) {
         if (canonicalPath.isEmpty()) {
@@ -189,16 +169,52 @@ public class Main {
             if (c == currentChar) {
                 count++;
             } else {
-                // Append the count and the current character
                 factorizedPath.append(count).append(currentChar).append(" ");
                 currentChar = c;
                 count = 1;
             }
         }
 
-        // Append the last group
         factorizedPath.append(count).append(currentChar);
 
         return factorizedPath.toString().trim();
+    }
+
+    /**
+     * Validates a path against the maze.
+     */
+    private static boolean validatePath(char[][] maze, int[] entryPoint, String path) {
+        int row = entryPoint[0];
+        int col = entryPoint[1];
+        int direction = 0; // 0: East, 1: South, 2: West, 3: North
+
+        for (char move : path.toCharArray()) {
+            switch (move) {
+                case 'F': // Move forward
+                    switch (direction) {
+                        case 0 -> col++;
+                        case 1 -> row++;
+                        case 2 -> col--;
+                        case 3 -> row--;
+                    }
+                    break;
+                case 'R': // Turn right
+                    direction = (direction + 1) % 4;
+                    break;
+                case 'L': // Turn left
+                    direction = (direction + 3) % 4;
+                    break;
+                default:
+                    logger.error("Invalid move in path: " + move);
+                    return false;
+            }
+
+            // Check bounds and walls
+            if (row < 0 || row >= maze.length || col < 0 || col >= maze[0].length || maze[row][col] == '#') {
+                return false;
+            }
+        }
+
+        return true;
     }
 }
