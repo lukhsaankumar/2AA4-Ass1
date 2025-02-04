@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MazeExplorer {
-
     private final char[][] maze;
     private int currentRow;
     private int currentCol;
@@ -25,21 +24,23 @@ public class MazeExplorer {
      * @return The canonical path as a string.
      */
     public String exploreMaze(int[] exitPoint) {
+        StringBuilder canonicalPath = new StringBuilder();
+        
         while (currentRow != exitPoint[0] || currentCol != exitPoint[1]) {
             if (canMoveRight()) {
                 turnRight();
+                canonicalPath.append("R");
                 moveForward();
-                path.add("R");
-                path.add("F");
+                canonicalPath.append("F");
             } else if (canMoveForward()) {
                 moveForward();
-                path.add("F");
+                canonicalPath.append("F");
             } else {
                 turnLeft();
-                path.add("L");
+                canonicalPath.append("L");
             }
         }
-        return String.join("", path);
+        return canonicalPath.toString();
     }
 
     private boolean canMoveForward() {
