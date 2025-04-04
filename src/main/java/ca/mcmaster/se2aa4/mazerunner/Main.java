@@ -55,7 +55,7 @@ public class Main {
         }
     }
 
-    private static char[][] readMaze(String filePath) {
+    public static char[][] readMaze(String filePath) {
         List<char[]> mazeRows = new ArrayList<>();
         int maxRowLength = 0;
 

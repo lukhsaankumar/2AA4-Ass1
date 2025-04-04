@@ -26,6 +26,14 @@
       <version>1.6.0</version>
     </dependency>
 
+    <!-- JUnit dependencies for testing -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter</artifactId>
+      <version>5.9.2</version>
+      <scope>test</scope>
+    </dependency>
+
     <!-- Log4J dependencies for logging -->
     <dependency>
       <groupId>org.apache.logging.log4j</groupId>
