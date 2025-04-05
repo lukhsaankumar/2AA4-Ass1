@@ -1,87 +1,46 @@
 package ca.mcmaster.se2aa4.mazerunner;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.awt.Point;
+import ca.mcmaster.se2aa4.mazerunner.Path.Path;
 
 public class MazeExplorer {
-    private final char[][] maze;
-    private int currentRow;
-    private int currentCol;
-    private int direction; // 0: East, 1: South, 2: West, 3: North
-    private final List<String> path; // Store path as instructions (F, R, L)
+    private Point location;
+    private char facing;
+    private Path route;
 
-    public MazeExplorer(char[][] maze, int[] entryPoint) {
-        this.maze = maze;
-        this.currentRow = entryPoint[0];
-        this.currentCol = entryPoint[1];
-        this.direction = 0; // Assume we start facing East
-        this.path = new ArrayList<>();
+    public MazeExplorer(Point start, char direction) {
+        this.location = start;
+        this.facing = direction;
+        this.route = new Path();
     }
 
-    /**
-     * Implements the right-hand rule to find a path to the exit.
-     * @param exitPoint The exit point of the maze.
-     * @return The canonical path as a string.
-     */
-    public String exploreMaze(int[] exitPoint) {
-        StringBuilder canonicalPath = new StringBuilder();
-        
-        while (currentRow != exitPoint[0] || currentCol != exitPoint[1]) {
-            if (canMoveRight()) {
-                turnRight();
-                canonicalPath.append("R");
-                moveForward();
-                canonicalPath.append("F");
-            } else if (canMoveForward()) {
-                moveForward();
-                canonicalPath.append("F");
-            } else {
-                turnLeft();
-                canonicalPath.append("L");
-            }
-        }
-        return canonicalPath.toString();
+    public void moveForward() {
+        if (facing == 'N') location.y--;
+        else if (facing == 'E') location.x++;
+        else if (facing == 'S') location.y++;
+        else location.x--;
+        route.addStep("F");
     }
 
-    private boolean canMoveForward() {
-        int[] nextPos = getNextPosition();
-        return isInBounds(nextPos[0], nextPos[1]) && maze[nextPos[0]][nextPos[1]] != '#';
+    public void turnLeft() {
+        if (facing == 'N') facing = 'W';
+        else if (facing == 'W') facing = 'S';
+        else if (facing == 'S') facing = 'E';
+        else facing = 'N';
+        route.addStep("L");
     }
 
-    private boolean canMoveRight() {
-        int originalDirection = direction;
-        turnRight();
-        int[] nextPos = getNextPosition();
-        turnLeft(); // Revert direction after checking
-        direction = originalDirection;
-        return isInBounds(nextPos[0], nextPos[1]) && maze[nextPos[0]][nextPos[1]] != '#';
+    public void turnRight() {
+        if (facing == 'N') facing = 'E';
+        else if (facing == 'E') facing = 'S';
+        else if (facing == 'S') facing = 'W';
+        else facing = 'N';
+        route.addStep("R");
     }
 
-    private void turnRight() {
-        direction = (direction + 1) % 4;
-    }
+    public Point getPosition() {return location; } 
 
-    private void turnLeft() {
-        direction = (direction + 3) % 4;
-    }
+    public char getDirection() { return facing; }
 
-    private void moveForward() {
-        int[] nextPos = getNextPosition();
-        currentRow = nextPos[0];
-        currentCol = nextPos[1];
-    }
-
-    private int[] getNextPosition() {
-        switch (direction) {
-            case 0: return new int[]{currentRow, currentCol + 1}; // East
-            case 1: return new int[]{currentRow + 1, currentCol}; // South
-            case 2: return new int[]{currentRow, currentCol - 1}; // West
-            case 3: return new int[]{currentRow - 1, currentCol}; // North
-            default: throw new IllegalStateException("Invalid direction");
-        }
-    }
-
-    private boolean isInBounds(int row, int col) {
-        return row >= 0 && row < maze.length && col >= 0 && col < maze[0].length;
-    }
+    public Path getPath() { return route;}
 }

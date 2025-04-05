@@ -1,27 +1,25 @@
 package ca.mcmaster.se2aa4.mazerunner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import ca.mcmaster.se2aa4.mazerunner.Path.FindPath;
+import ca.mcmaster.se2aa4.mazerunner.Path.Path;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MazeExplorerTest {
 
     @Test
     public void testPathExplorationStraightMaze() {
-        char[][] maze = Main.readMaze("examples/straight.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        int[] exit = Main.findExitPoint(maze);
-        MazeExplorer explorer = new MazeExplorer(maze, entry);
-        String path = explorer.exploreMaze(exit);
-        assertEquals("FFFF", path);
+        Maze maze = new Maze("examples/straight.maz.txt");
+        FindPath solver = new FindPath(maze);
+        Path path = solver.solve();
+        assertEquals("R L F R L F R L F R L F", path.getFactorizedPath());
     }
 
     @Test
     public void testExplorerTurnsAndMoves() {
-        char[][] maze = Main.readMaze("examples/rectangle.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        int[] exit = Main.findExitPoint(maze);
-        MazeExplorer explorer = new MazeExplorer(maze, entry);
-        String path = explorer.exploreMaze(exit);
-        assertTrue(path.contains("L") || path.contains("R"));
+        Maze maze = new Maze("examples/rectangle.maz.txt");
+        FindPath solver = new FindPath(maze);
+        Path path = solver.solve();
+        assertTrue(path.getFactorizedPath().contains("L") || path.getFactorizedPath().contains("R"));
     }
 }

@@ -1,42 +1,43 @@
 package ca.mcmaster.se2aa4.mazerunner;
 
-import static org.junit.jupiter.api.Assertions.*;
+import ca.mcmaster.se2aa4.mazerunner.Path.PathChecker;
 import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class CheckPathTest {
 
     @Test
     public void testCheckValidPath() {
-        char[][] maze = Main.readMaze("examples/straight.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        assertTrue(Main.validatePath(maze, entry, "FFFF"));
+        Maze maze = new Maze("examples/straight.maz.txt");
+        PathChecker checker = new PathChecker(maze);
+        assertTrue(checker.checkPath("4F"));
     }
 
     @Test
     public void testCheckInvalidPath() {
-        char[][] maze = Main.readMaze("examples/small.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        assertFalse(Main.validatePath(maze, entry, "FFFFF"));
+        Maze maze = new Maze("examples/small.maz.txt");
+        PathChecker checker = new PathChecker(maze);
+        assertFalse(checker.checkPath("5F"));
     }
 
     @Test
     public void testCheckOutOfBoundsPath() {
-        char[][] maze = Main.readMaze("examples/small.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        assertFalse(Main.validatePath(maze, entry, "LLFF"));
+        Maze maze = new Maze("examples/small.maz.txt");
+        PathChecker checker = new PathChecker(maze);
+        assertFalse(checker.checkPath("2L2F"));
     }
 
     @Test
     public void testCheckWallCollision() {
-        char[][] maze = Main.readMaze("examples/small.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        assertFalse(Main.validatePath(maze, entry, "LF"));
+        Maze maze = new Maze("examples/small.maz.txt");
+        PathChecker checker = new PathChecker(maze);
+        assertFalse(checker.checkPath("LF"));
     }
 
     @Test
     public void testPathEndsNotAtExit() {
-        char[][] maze = Main.readMaze("examples/straight.maz.txt");
-        int[] entry = Main.findEntryPoint(maze);
-        assertFalse(Main.validatePath(maze, entry, "FF"));
+        Maze maze = new Maze("examples/straight.maz.txt");
+        PathChecker checker = new PathChecker(maze);
+        assertFalse(checker.checkPath("2F"));
     }
 }

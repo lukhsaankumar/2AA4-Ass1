@@ -15,7 +15,7 @@ This program explores a maze, finding a path from an entry point to an exit one.
 - The Maze is surrounded by walls on its four borders, except for its entry/exit points.
     - Entry and exit points are always located on the East and West border.
     - The maze is not directed. As such, exit and entry can be interchanged.
-- At the beginning of the exploration, we're located on the entry tile, facing the opposite side (e.g., if entering by the eastern entry, you're facing West).
+- At the beginning of the exploration, we're located on the entry Cell, facing the opposite side (e.g., if entering by the eastern entry, you're facing West).
 - The program generates a sequence of instructions to reach the opposite exit (i.e., a "path"):
     - `F` means 'move forward' according to your current direction
     - `R` means 'turn right' (does not move, just change direction), and `L` means ‘turn left’. 
